@@ -1,0 +1,32 @@
+What is the smallest positive number that is evenly divisible(divisible with no remainder) by all of the numbers from  1 to N?
+
+hmm
+
+the first one is obv, n!
+
+lets take 
+
+
+10!
+the smallest one is 2520
+
+2*3*4*5*6*7*8*9*10 = 3628800
+https://en.wikipedia.org/wiki/2520_(number)#:~:text=The%20factors%2C%20also%20called%20divisors,%2C%20840%2C%201260%2C%202520.
+
+wait
+
+it is basically 
+
+LCM aka least common multiple
+https://en.wikipedia.org/wiki/Least_common_multiple
+
+lcm(a,b) = a*b / gcd(a,b), but that doesnt help
+
+
+The lcm will be the product of multiplying the highest power of each prime number together. The highest power of the three prime numbers 2, 3, and 7 is 23, 32, and 71, respectively.
+
+plan:
+- make lazy primes generator
+- make a prime factor decomposition function
+- decompose each item in the list get the highest prime powers for each item multiply them and we have a solution!
+easy it worked
