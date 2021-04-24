@@ -1,0 +1,211 @@
+f(n) = fact(a) + fact(b) + fact(c) + fact(d)
+0123456789
+same as any permutation of that -> 
+f(n) = x1*fact(0) + x2*fact(1) + ... + x10 fact(9)
+
+sf(n) = sum(digits(a)) = sum(justdigitst(a + 10*a + 100*b + 1000*c ...))
+
+//search problem
+g(i) = smallest n such that sf(n) = i
+
+//lets try to do it without g(i)
+
+sum(justdigitst(a + 10*a + 100*b + 1000*c ...))
+
+
+ssf(1) + ssf(2) + ssf(3) ...
+
+where
+
+ssf is:
+
+(a1*1 + a2*10 + a3*100 + a4*1000 + a5*10000 ...) -> a1 + a2 + a3 + a4 ... = b1 + b2*10 + b3*100 + ...
+
+
+ugh to start again:
+
+
+given n -> 
+n = x1*fact(0) + x2*fact(2) + x3*fact(3) + ... + x10*fact(9) where x is the number of occurences of d in range 0-9
+= x1(1) + x2(1*2) + x3(1*2*3) + x4(1*2*3*4)
+= x1 + 2(x2 + 3(x3 + 4(x4 + 5(x5 + 6(x6 + ...))))) so that is cool but just having a dict with fact for d is faster
+
+or is it?
+given a fat n which can have up to 18 digits:
+
+with the formula we would have:
+~10 mult + 10 add
+with lookup dict we have:
+10 lookups + 10 adds
+
+conclusion: about the same
+
+following -> 
+
+we know that we have to again take the sum of the digits, does this help in any way?
+given this: x1 + 2(x2 + 3(x3 + 4(x4 + 5(x5 + 6(x6 + ...))))) = t
+we want the sum of the digits of t.
+
+ok dunno
+
+lets introduce the factorials that would be actually calculated:
+
+{
+	0: 1,
+	1: 1,
+	2: 2,
+	3: 6,
+	4: 24,
+	5: 120,
+	6: 720,
+	7: 5040,
+	8: 40320,
+	9: 362880
+}
+
+so f(n) is AGAIN:
+
+1*numOfZero(n) + 1*numOfOne(n) + 2*numOfTwo(n) + 6*numOfThree(n) + 24*numOfFour(n) + ... + 362880*numOfNine(n)
+
+we get the idea.
+
+so now trying again, sf(n) IS:
+
+... compiled digits of the prev sum ... 
+ok lets go on an adventure:
+https://www.sjsu.edu/faculty/watkins/Digitsum.htm#:~:text=The%20digit%20sum%20of%20a,sum%20of%20786%20is%203.
+
+Lets find something useful here.
+
+so
+1. The most famous property of digit sums is that the digit sum of all multiples of 9 is 9.
+For examples, DigitSum(18)=9, DigitSum(27)=9, DigitSum(99)=9, etc.
+
+hm nice
+
+2. DigitSum(a+b) = DigitSum(DigitSum(a)+DigitSum(b))
+Example, DigitSum(786+152) = DigitSum(938) = 2
+DigitSum(786) + DigitSum(152) = DigitSum(3 + 8) = 2
+
+3. DigitSum(a*b) = DigitSum(DigitSum(a)*DigitSum(b))
+Example: DigitSum(35*16) = DigitSum(560) = 2
+DigitSum(35)*DigitSum(16) = DigitSum(8*7) = DigitSum(56) = 2
+
+ok ok this might be useful
+
+
+OK in light of these properties lets try to rephrase sf(n)
+
+sf(n) = DigitSum(DigitSum(fact(a) + fact(b) + fact(c) + fact(d) + ...)) where n = abcd...
+
+g is actually where it gets interesting...
+
+i =  DigitSum(DigitSum(fact(a) + fact(b) + fact(c) + fact(d) + ...)) where n = abcd...
+
+can we get n directly from i?
+
+well to reverse the digit sum and have the min number that sums to x we have to get the individual digits in range 0 to 9 and arrange them in an ascending order
+
+so how could we get a fast algorithm for that?
+
+given a set = [1,2,3,4,5,6,7,8,9]
+
+we want a composition that sums to C prioritize big digits
+
+ah ok this is quite ez, just substract the biggest number from target until you are done
+
+
+so we already we worked our way back a bit
+
+for instance
+
+7 = DigitSum(1*numOfZero(n) + 1*numOfOne(n) + 2*numOfTwo(n) + 6*numOfThree(n) + 24*numOfFour(n) + ... + 362880*numOfNine(n))
+
+apply the same reverse digit sum algo again:
+
+we get something like for ex:
+
+25 = 1*numOfZero(n) + 1*numOfOne(n) + 2*numOfTwo(n) + 6*numOfThree(n) + 24*numOfFour(n) + ... + 362880*numOfNine(n)
+
+we need another algo to break this down:
+
+given a set [1,2,6,24,120,720,5040,40320,362880]
+
+prioritize the biggest divisors, we need to factor the num into the biggest divisors from the set
+
+the res components for each factor are the number of 1 to 9 digits that again need to be arranged in ascending order
+
+And that is how we get n from g(i) at first try?
+
+
+ok i got lost..
+
+if i have 5 and f(n):
+f(122) = 1! + 1! + 2! = 5  -> sf -> 5
+f(342) = 3! + 4! + 2! = 32 -> sf -> 5
+f(25) = 2! + 5! = 122 -> sf -> 5
+
+omg what is this 
+
+the current solution works like 122 but we want it to work like 25
+
+maybe we just have to continuously call factorial_reverse untill it cannot reverse? but you can reverse the 25
+
+call the reverse untill the number stops shrinking and starts growing???
+
+short expermient shows:
+factored 122
+factored 25
+factored 14
+factored 233
+factored 1223344445
+
+what about the sum of the digits?
+
+so im investigating sf
+
+factored 122 =fac> 5 =ds> 5
+factored 25 =fac> 122 =ds> 5
+factored 14 =fac> 25 =ds> 7
+factored 233 =fac> 14 =ds> 5
+factored 1223344445 =fac> 233 =ds> 8
+
+factored 12 =fac> 3 =ds> 3
+factored 33 =fac> 12 =ds> 3
+factored 22 =fac> 4 =ds> 4
+factored 22333 =fac> 22 =ds> 4
+factored 122 =fac> 5 =ds> 5
+factored 25 =fac> 122 =ds> 5
+factored 3 =fac> 6 =ds> 6
+factored 12 =fac> 3 =ds> 3
+factored 13 =fac> 7 =ds> 7
+factored 133 =fac> 13 =ds> 4
+factored 23 =fac> 8 =ds> 8
+factored 122333 =fac> 23 =ds> 5
+
+
+more experiments. . .
+
+from 5 we know that the lowest digit sum reverse is not what we want actually
+
+sf(n) can be rephrased again ...
+
+sf(n) = digitSum(fact(d1) + fact(d2) + fact(d3) + fact(d4) + ...)
+
+as
+
+sf(n) = digitSum(digitSum(fact(d1)) + digitSum(fact(d2)) + ...)
+
+this doesnt seem to give anything right now.
+
+lets do some more experiments on that 5
+
+lets get digit sums that equal 5
+
+
+
+observation if base of digit is divisible by m we can discard it
+
+sg(i) = sum(digits(g(i)))
+
+!oh but we also have to disp modulo m
